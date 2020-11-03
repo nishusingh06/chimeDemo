@@ -44,4 +44,10 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
+    //chime sdk
+    implementation(name: 'amazon-chime-sdk', ext: 'aar')
+    implementation(name: 'amazon-chime-sdk-media', ext: 'aar')
+
+    // run time permission
+    implementation 'com.karumi:dexter:6.0.2'
 }
