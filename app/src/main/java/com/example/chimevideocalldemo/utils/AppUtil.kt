@@ -2,13 +2,19 @@ package com.example.chimevideocalldemo.utils
 
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.text.Html
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.example.chimevideocalldemo.R
 import java.net.URLEncoder
 
-class AppUtils {
+class AppUtil {
     companion object {
 
         /* show alert dialog with - ok and cancel options & callback*/
@@ -70,6 +76,10 @@ class AppUtils {
 
         fun encodeURLParam(string: String?): String {
             return URLEncoder.encode(string, "utf-8")
+        }
+
+        fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToRoot: Boolean = false): View {
+            return LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
         }
     }
 }

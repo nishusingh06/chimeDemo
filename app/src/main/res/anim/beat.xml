@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--//used to make a beat animation-->
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <scale android:fromXScale="1.1"
+        android:fromYScale="1.1"
+        android:pivotX="55%"
+        android:pivotY="20%"
+        android:toXScale="1.23"
+        android:toYScale="1.23"
+        android:interpolator="@android:anim/accelerate_interpolator"
+        android:duration="600"
+        android:repeatMode="reverse"
+        android:repeatCount="infinite"
+        />
+</set>

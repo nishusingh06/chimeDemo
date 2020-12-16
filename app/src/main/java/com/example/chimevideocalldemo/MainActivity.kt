@@ -4,12 +4,9 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.amazonaws.services.chime.sdk.meetings.utils.logger.ConsoleLogger
-import com.amazonaws.services.chime.sdk.meetings.utils.logger.LogLevel
-import com.example.chimevideocalldemo.utils.AppConstants
-import com.example.chimevideocalldemo.utils.AppUtils
+import com.example.chimevideocalldemo.utils.AppConstant
+import com.example.chimevideocalldemo.utils.AppUtil
 import com.example.chimevideocalldemo.utils.IDialogCallback
 import com.example.chimevideocalldemo.videoCall.MeetingActivity
 import com.karumi.dexter.Dexter
@@ -26,24 +23,21 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
-    private var meetingID: String? = null
-    private var attendeeNameSelf: String? = null
-
-    private val logger = ConsoleLogger(LogLevel.INFO)
-    private val TAG: String = "MainActivity"
     private val uiScope = CoroutineScope(Dispatchers.Main)
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
+    //AWS- region of meeting
     private val MEETING_REGION = "us-east-1"
-    private val Request_Permission_Result_Code = 222
+
+    //AWS- unique id of meeting, can consider as room
+    private var meetingID: String? = null
+    private var nameSelf: String? = null
+
+    private val Permission_Result_Code = 222
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        initListener()
-    }
-
-    private fun initListener() {
 
         btnJoin.setOnClickListener {
             validateData()
@@ -51,19 +45,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * validate if meeting id and attendee name for empty or null
+     * validating meeting id and attendee name for empty or null
      * */
     private fun validateData() {
-        //replacing space by + symbol, if contains any
+        //replacing space by + symbol, if any
         meetingID = etMeetingId?.text.toString().trim().replace("\\s+".toRegex(), "+")
-        attendeeNameSelf = etName?.text.toString().trim().replace("\\s+".toRegex(), "+")
+        nameSelf = etName?.text.toString().trim().replace("\\s+".toRegex(), "+")
 
         when {
             meetingID.isNullOrBlank() -> {
-                AppUtils.showToast(this, getString(R.string.err_meeting_id_invalid))
+                AppUtil.showToast(this, getString(R.string.err_meeting_id_invalid))
             }
-            attendeeNameSelf.isNullOrBlank() -> {
-                AppUtils.showToast(this, getString(R.string.err_attendee_name_invalid))
+            nameSelf.isNullOrBlank() -> {
+                AppUtil.showToast(this, getString(R.string.err_attendee_name_invalid))
             }
             else -> {
                 requestCameraPermission()
@@ -71,6 +65,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * request basic permissions before starting meeting
+     * */
     private fun requestCameraPermission() {
         Dexter.withActivity(this).withPermissions(
             Manifest.permission.CAMERA,
@@ -80,8 +77,8 @@ class MainActivity : AppCompatActivity() {
             override fun onPermissionsChecked(report: MultiplePermissionsReport) {
                 if (report.areAllPermissionsGranted()) {
 
-                    //validate and create meeting object
-                    authenticate(getString(R.string.test_url), meetingID, attendeeNameSelf)
+                    //authenticate meeting url and begin meeting object creation steps
+                    authenticate(getString(R.string.test_url), meetingID, nameSelf)
                 } else {
                     showSetting()
                 }
@@ -91,48 +88,54 @@ class MainActivity : AppCompatActivity() {
                 permissions: List<PermissionRequest>,
                 token: PermissionToken
             ) {
-                token.continuePermissionRequest();
+                token.continuePermissionRequest()
             }
-        })
-            .withErrorListener { showSetting() }
-            .onSameThread().check()
+        }).withErrorListener { showSetting() }.onSameThread().check()
     }
 
+    /**
+     * validate meeting url, if valid
+     *
+     * @param attendeeName - name of attendee, entered by user
+     * @param meetingId - meeting id, entered by user
+     * @param meetingUrl - url of meeting fetched from serverless demo application or server
+     * */
     private fun authenticate(
         meetingUrl: String,
         meetingId: String?,
         attendeeName: String?
     ) =
         uiScope.launch {
-            logger.info(
-                TAG,
-                "Joining meeting. meetingUrl: $meetingUrl, meetingId: $meetingId, attendeeName: $attendeeName"
-            )
+
             if (!meetingUrl.startsWith("http")) {
-                AppUtils.showToast(
+                AppUtil.showToast(
                     applicationContext,
                     getString(R.string.user_notification_meeting_url_error)
                 )
             } else {
-                //authenticationProgressBar?.visibility = View.VISIBLE
+                /*meetingResponseJson: response returned from api call, meetingResponseJson will contain
+                 *all the information needed for a application to join the meeting.
+                 * */
                 val meetingResponseJson: String? = joinMeeting(meetingUrl, meetingId, attendeeName)
 
-                //authenticationProgressBar?.visibility = View.INVISIBLE
                 if (meetingResponseJson == null) {
-                    AppUtils.showToast(
+                    AppUtil.showToast(
                         applicationContext,
                         getString(R.string.user_notification_meeting_start_error)
                     )
                 } else {
                     val intent = Intent(applicationContext, MeetingActivity::class.java)
-                    intent.putExtra(AppConstants.BK.MEETING_RESPONSE_KEY, meetingResponseJson)
-                    intent.putExtra(AppConstants.BK.MEETING_ID_KEY, meetingId)
-                    intent.putExtra(AppConstants.BK.NAME_KEY, attendeeName)
+                    intent.putExtra(AppConstant.BK.MEETING_RESPONSE_KEY, meetingResponseJson)
+                    intent.putExtra(AppConstant.BK.MEETING_ID_KEY, meetingId)
+                    intent.putExtra(AppConstant.BK.NAME_KEY, attendeeName)
                     startActivity(intent)
                 }
             }
         }
 
+    /**
+     * method: to make api-call to fetch meetingResponseJson-object from serverless application
+     */
     private suspend fun joinMeeting(
         meetingUrl: String,
         meetingId: String?,
@@ -144,9 +147,9 @@ class MainActivity : AppCompatActivity() {
             //Don't forget to escape the inputs appropriately
             val serverUrl =
                 URL(
-                    "${url}join?title=${AppUtils.encodeURLParam(meetingId)}&name=${AppUtils.encodeURLParam(
+                    "${url}join?title=${AppUtil.encodeURLParam(meetingId)}&name=${AppUtil.encodeURLParam(
                         attendeeName
-                    )}&region=${AppUtils.encodeURLParam(MEETING_REGION)}"
+                    )}&region=${AppUtil.encodeURLParam(MEETING_REGION)}"
                 )
 
             try {
@@ -165,15 +168,13 @@ class MainActivity : AppCompatActivity() {
                         it.close()
                     }
 
-                    if (responseCode == 200) {
+                    if (responseCode == 201) {
                         response.toString()
                     } else {
-                        logger.error(TAG, "Unable to join meeting. Response code: $responseCode")
                         null
                     }
                 }
             } catch (exception: Exception) {
-                logger.error(TAG, "There was an exception while joining the meeting: $exception")
                 null
             }
         }
@@ -183,7 +184,7 @@ class MainActivity : AppCompatActivity() {
      * method: to open setting screen to grant permissions manually
      */
     private fun showSetting() {
-        AppUtils.showAlert(this, getString(R.string.permission_req), IDialogCallback { isTrue ->
+        AppUtil.showAlert(this, getString(R.string.permission_req), IDialogCallback { isTrue ->
             if (isTrue) {
                 launchSetting()
             } else {
@@ -200,15 +201,18 @@ class MainActivity : AppCompatActivity() {
         val uri =
             Uri.fromParts("package", this.packageName, null as String?)
         intent.data = uri
-        startActivityForResult(intent, Request_Permission_Result_Code)
+        startActivityForResult(intent, Permission_Result_Code)
     }
 
+    /**
+     * authenticate meeting url, if permissions granted from settings page
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == Request_Permission_Result_Code) {
+        if (requestCode == Permission_Result_Code) {
 
-            // initialize and connect to the meeting- chime
-            authenticate(getString(R.string.test_url), meetingID, attendeeNameSelf)
+            //authenticate meeting url and begin meeting object creation steps
+            authenticate(getString(R.string.test_url), meetingID, nameSelf)
         }
     }
 }

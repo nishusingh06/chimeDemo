@@ -18,5 +18,9 @@
     <string name="err_attendee_name_invalid">Attendee name is invalid</string>
     <string name="user_notification_meeting_start_error">There was an error starting the meeting. Please try again</string>
     <string name="user_notification_meeting_url_error">Your url is invalid</string>
+    <string name="err_video_disabled">Video sharing has been disabled</string>
+    <string name="err_video_paused_poor_network">Poor connection</string>
+    <string name="tv_waiting">waiting for other participants to join meeting..</string>
+    <string name="tv_connecting">connecting..</string>
 
 </resources>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ltRoot"
+    android:layout_width="80dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="7dp"
+    android:layout_marginEnd="7dp"
+    android:background="@android:color/transparent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ltVideoSurfaceHolder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rect_white"
+        android:padding="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivBlurViewAttendee"
+            android:layout_width="65dp"
+            android:layout_height="85dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_blur_view_call"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvPlaceholderAttendee"
+            android:layout_width="55dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
+            android:maxLines="4"
+            android:text="@string/err_video_paused_poor_network"
+            android:textAlignment="center"
+            android:textColor="@color/color_white"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.amazonaws.services.chime.sdk.meetings.audiovideo.video.DefaultVideoRenderView
+            android:id="@+id/attendeeVideoSurface"
+            android:layout_width="65dp"
+            android:layout_height="85dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivSignalStrength"
+        android:layout_width="18dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:layout_margin="7dp"
+        android:elevation="8dp"
+        android:src="@drawable/ic_signal_strength_high"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/ltMuteAttendee"
+        app:layout_constraintTop_toBottomOf="@+id/tvAttendeeName" />
+
+    <LinearLayout
+        android:id="@+id/ltMuteAttendee"
+        android:layout_width="38dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAttendeeName">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btnMuteAttendee"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_mike_off"
+            android:tint="@color/color_white" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvAttendeeName"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/bg_rect_white"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:textAlignment="center"
+        android:textColor="@color/color_black"
+        android:textSize="8sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ltVideoSurfaceHolder" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

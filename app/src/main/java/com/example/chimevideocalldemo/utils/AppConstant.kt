@@ -1,6 +1,6 @@
 package com.example.chimevideocalldemo.utils
 
-class AppConstants {
+class AppConstant {
 
     interface BK {
         companion object {
